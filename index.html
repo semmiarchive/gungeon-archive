@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gungeon Archive — энциклопедия Enter the Gungeon</title>
+<style>
+:root{
+  --bg:#0e0e10; --bg2:#151518; --card:#1a1a1e; --line:#2a2a30; --text:#e8e6e1; --mute:#8d8b86;
+  --accent:#c9a15f; --accent2:#a8803f;
+  --qS:#c9a15f; --qA:#b5655a; --qB:#6f8fa8; --qC:#7d9a74; --qD:#8d8b86; --qN:#55555b;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:20;background:rgba(14,14,16,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top{max-width:1280px;margin:0 auto;padding:14px 20px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:15px}
+.logo span{color:var(--accent)}
+.tabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.tab{background:none;border:0;color:var(--mute);padding:7px 14px;border-radius:7px;cursor:pointer;font:inherit;font-weight:600;transition:.15s}
+.tab:hover{color:var(--text)}
+.tab.on{background:var(--card);color:var(--accent);box-shadow:0 0 0 1px var(--line)}
+.search{margin-left:auto;position:relative;flex:1;min-width:200px;max-width:340px}
+.search input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);font:inherit;outline:0;transition:.15s}
+.search input:focus{border-color:var(--accent2)}
+main{max-width:1280px;margin:0 auto;padding:24px 20px 80px}
+.bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--bg2);border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:5px 12px;cursor:pointer;font:inherit;font-weight:700;font-size:13px;transition:.15s}
+.chip:hover{color:var(--text)}
+.chip.on{color:#0e0e10;background:var(--c,var(--accent));border-color:var(--c,var(--accent))}
+.count{margin-left:auto;color:var(--mute);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:.18s;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.card:hover{transform:translateY(-3px);border-color:var(--q,var(--accent2));box-shadow:0 10px 28px rgba(0,0,0,.45)}
+.card::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:var(--q,var(--line))}
+.q{position:absolute;top:10px;right:10px;font-weight:800;font-size:12px;color:var(--q);border:1px solid var(--q);border-radius:6px;padding:1px 7px}
+.pic{height:84px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border-radius:10px}
+.pic img{max-width:80%;max-height:68px;image-rendering:pixelated;object-fit:contain}
+.name{font-weight:700;font-size:15px;line-height:1.25}
+.quote{color:var(--mute);font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.9em}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
+.stat{background:var(--bg2);border-radius:8px;padding:5px 8px}
+.stat small{display:block;color:var(--mute);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat b{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.more{display:block;margin:30px auto 0;background:var(--card);border:1px solid var(--line);color:var(--text);padding:11px 28px;border-radius:10px;cursor:pointer;font:inherit;font-weight:600}
+.more:hover{border-color:var(--accent2);color:var(--accent)}
+.state{text-align:center;color:var(--mute);padding:90px 20px}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;margin:0 auto 16px;animation:s .8s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+.state button{margin-top:14px;background:var(--accent);color:#0e0e10;border:0;padding:9px 20px;border-radius:8px;font-weight:700;cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal.open{display:flex}
+.sheet{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--q,var(--accent));border-radius:16px;width:100%;max-width:760px;max-height:90vh;overflow:auto;padding:26px}
+.sheet .pic{height:130px;margin-bottom:16px}
+.sheet .pic img{max-height:110px}
+.sheet h2{font-size:22px;margin-bottom:4px}
+.rows{margin-top:16px;display:grid;gap:1px;background:var(--line);border-radius:10px;overflow:hidden}
+.row{display:grid;grid-template-columns:140px 1fr;gap:12px;background:var(--bg2);padding:8px 12px;font-size:13.5px}
+.row span{color:var(--mute)}
+.actions{display:flex;gap:10px;margin-top:18px}
+.actions a,.actions button{flex:1;text-align:center;text-decoration:none;background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:9px;border-radius:9px;cursor:pointer;font:inherit;font-weight:600}
+.actions a:hover,.actions button:hover{border-color:var(--accent2);color:var(--accent)}
+footer{text-align:center;color:var(--mute);font-size:12.5px;padding:30px}
+.sec{margin-top:20px}
+.sec h3{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px}
+.sec p{color:#cfcdc7;font-size:14px;margin-bottom:8px}
+.sec ul{padding-left:18px;color:#cfcdc7;font-size:14px;display:grid;gap:5px}
+.sec li::marker{color:var(--accent2)}
+.dload{color:var(--mute);font-size:13px;margin-top:20px;display:flex;gap:10px;align-items:center}
+.dload .spin{width:16px;height:16px;border-width:2px;margin:0}
+.lead{color:var(--mute);font-style:italic;margin-top:4px}
+@media(max-width:560px){.search{max-width:none;margin-left:0}.row{grid-template-columns:100px 1fr}}
+</style>
+</head>
+<body>
+<header><div class="top">
+  <div class="logo">Gungeon <span>Archive</span></div>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="search"><input id="q" type="search" placeholder="Поиск по названию…" autocomplete="off"></div>
+</div></header>
+
+<main>
+  <div class="bar"><div class="chips" id="chips"></div><div class="count" id="count"></div></div>
+  <div id="view"></div>
+</main>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<footer>Gungeon Archive — фан-проект по Enter the Gungeon</footer>
+
+<script>
+const BASE = "https://enterthegungeon.wiki.gg";
+const API = BASE + "/api.php";
+const CATS = [
+  {id:"guns",  label:"Оружие",   page:"Guns",    quality:true},
+  {id:"items", label:"Предметы", page:"Items",   quality:true},
+  {id:"enemies",label:"Враги",   page:"Enemies", quality:false},
+  {id:"bosses",label:"Боссы",    page:"Bosses",  quality:false}
+];
+const QLIST = ["S","A","B","C","D"];
+const QCOL = {S:"--qS",A:"--qA",B:"--qB",C:"--qC",D:"--qD"};
+const PRIORITY = ["dps","damage","magazine size","clip size","ammo capacity","max ammo","reload time","fire rate","type","health","location","shot speed","range"];
+const TEXTKEYS = ["quote","effect","notes","description"];
+
+const LABELS = {"dps":"DPS","damage":"Урон","magazine size":"Размер магазина","clip size":"Размер магазина","ammo capacity":"Макс. боезапас","max ammo":"Макс. боезапас","reload time":"Перезарядка","fire rate":"Скорострельность","shot speed":"Скорость пули","range":"Дальность","force":"Сила удара","spread":"Разброс","type":"Тип","quote":"Цитата","effect":"Эффект","notes":"Заметки","health":"Здоровье","location":"Локация","description":"Описание","quality":"Качество","name":"Название","ammonomicon entry":"Запись в Аммономиконе","statistics":"Статистика","cost":"Цена","price":"Цена","unlock":"Как открыть","appears in":"Появляется в","sprite":"Спрайт","behavior":"Поведение","behaviour":"Поведение","attacks":"Атаки","drops":"Выпадает","speed":"Скорость","bullet speed":"Скорость пули","ammo":"Боезапас","reload":"Перезарядка","boss":"Босс","floor":"Этаж","chamber":"Камера"};
+const VALS = {"semiautomatic":"Полуавтоматическое","automatic":"Автоматическое","charged":"Заряжаемое","beam":"Лучевое","burst":"Очередью","passive":"Пассивный","active":"Активный","none":"Нет","infinite":"Бесконечно","n/a":"—","yes":"Да","no":"Нет"};
+const tl = k => LABELS[k.toLowerCase()] || k;
+const tv = v => VALS[v.toLowerCase()] || v;
+const needsTx = v => /[A-Za-z]{3,}/.test(v) && !VALS[v.toLowerCase()];
+const txCache = {};
+async function tx(arr){
+  const need = [...new Set(arr.filter(t=>t && !(t in txCache)))];
+  let chunk=[], len=0; const jobs=[];
+  need.forEach(t=>{ if(len+t.length>1500 && chunk.length){jobs.push(chunk);chunk=[];len=0;} chunk.push(t); len+=t.length+1; });
+  if(chunk.length) jobs.push(chunk);
+  await Promise.all(jobs.map(async c=>{
+    try{
+      const u = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ru&dt=t&q="+encodeURIComponent(c.join("\n"));
+      const j = await (await fetch(u)).json();
+      const parts = j[0].map(x=>x[0]).join("").split("\n");
+      if(parts.length===c.length) c.forEach((t,i)=>txCache[t]=parts[i].trim());
+    }catch(e){}
+  }));
+  return arr.map(t=>txCache[t]||t);
+}
+async function trDom(root){
+  const els=[...root.querySelectorAll("[data-tx]")]; if(!els.length) return;
+  const out = await tx(els.map(e=>e.textContent));
+  els.forEach((e,i)=>{ if(e.isConnected) e.textContent=out[i]; });
+}
+
+const cache = {};
+let cat = CATS[0], qf = new Set(), term = "", shown = 60;
+const $ = id => document.getElementById(id);
+const clean = s => (s||"").replace(/\[\d+\]|\[edit\]/g,"").replace(/\s+/g," ").trim();
+
+function abs(u){ try{ return new URL(u, BASE).href }catch(e){ return "" } }
+function bestImg(img){
+  if(!img) return "";
+  const ss = img.getAttribute("srcset");
+  let src = img.getAttribute("src") || img.getAttribute("data-src") || "";
+  if(ss){ const last = ss.split(",").pop().trim().split(" ")[0]; if(last) src = last; }
+  return abs(src);
+}
+function qualityOf(cell){
+  if(!cell) return "";
+  const txt = clean(cell.textContent).toUpperCase();
+  let m = txt.match(/^([SABCD])\b/); if(m) return m[1];
+  for(const im of cell.querySelectorAll("img")){
+    m = (im.getAttribute("alt")||"").toUpperCase().match(/\b([SABCD])\b/); if(m) return m[1];
+  }
+  return "";
+}
+
+async function load(c){
+  if(cache[c.id]) return cache[c.id];
+  const url = `${API}?action=parse&page=${encodeURIComponent(c.page)}&prop=text&redirects=1&format=json&formatversion=2&origin=*`;
+  const r = await fetch(url);
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const j = await r.json();
+  if(j.error) throw new Error(j.error.info);
+  const doc = new DOMParser().parseFromString(j.parse.text, "text/html");
+  const out = [], seen = new Set();
+  doc.querySelectorAll("table").forEach(t=>{
+    const rows = [...t.querySelectorAll("tr")];
+    const head = rows.find(r=>r.querySelector("th"));
+    if(!head) return;
+    const heads = [...head.children].map(h=>clean(h.textContent));
+    if(!heads.some(h=>/^name$/i.test(h))) return;
+    rows.slice(rows.indexOf(head)+1).forEach(tr=>{
+      const cells = [...tr.children].filter(x=>x.tagName==="TD"||x.tagName==="TH");
+      if(cells.length < 2) return;
+      const o = {stats:[], img:"", name:"", q:"", text:"", link:""};
+      cells.forEach((cell,i)=>{
+        const h = heads[i] || ("Колонка "+(i+1));
+        const val = clean(cell.textContent);
+        if(/^(icon|image|sprite)$/i.test(h) || (!h && cell.querySelector("img"))){
+          o.img = o.img || bestImg(cell.querySelector("img")); return;
+        }
+        if(/^name$/i.test(h)){
+          o.name = val; const a = cell.querySelector("a"); if(a) o.link = abs(a.getAttribute("href")); return;
+        }
+        if(/quality/i.test(h)){ o.q = qualityOf(cell); if(!o.q) o.stats.push([h,val]); return; }
+        if(TEXTKEYS.includes(h.toLowerCase()) && !o.text){ o.text = val; o.stats.push([h,val]); return; }
+        if(val && val.toLowerCase()!=="n/a" || h) { if(val) o.stats.push([h,val]); }
+      });
+      if(!o.img){ o.img = bestImg(tr.querySelector("img")); }
+      if(!o.name || seen.has(o.name)) return;
+      seen.add(o.name); out.push(o);
+    });
+  });
+  if(!out.length) throw new Error("Не удалось найти таблицу на странице «"+c.page+"»");
+  cache[c.id] = out; return out;
+}
+
+const SECT = {"effects":"Эффекты","effect":"Эффекты","notes":"Заметки","synergies":"Синергии","behaviour":"Поведение","behavior":"Поведение","trivia":"Интересные факты","strategy":"Стратегия","tips":"Советы","attacks":"Атаки","cut content":"Вырезанный контент","unlock":"Как получить","unlocking":"Как получить","description":"Описание","locations":"Где встречается","location":"Где встречается","history":"История","bugs":"Баги","ammonomicon entry":"Запись в Аммономиконе","statistics":"Статистика","stats":"Статистика"};
+const SKIP = /^(references?|gallery|navigation|see also|sources?|external links|videos?|contents)$/i;
+const dcache = {};
+async function loadDetail(o){
+  if(dcache[o.name]) return dcache[o.name];
+  const title = decodeURIComponent(new URL(o.link).pathname.replace(/^\/wiki\//,""));
+  const url = `${API}?action=parse&page=${encodeURIComponent(title)}&prop=text&redirects=1&format=json&formatversion=2&origin=*`;
+  const j = await (await fetch(url)).json();
+  if(j.error) throw new Error(j.error.info);
+  const doc = new DOMParser().parseFromString(j.parse.text,"text/html");
+  doc.querySelectorAll(".mw-editsection,sup.reference,.navbox,.toc,style,script,.noprint,.mw-empty-elt").forEach(n=>n.remove());
+  const d = {stats:[], img:"", sections:[]};
+  const info = doc.querySelector(".infobox,.portable-infobox,aside");
+  if(info){
+    d.img = bestImg(info.querySelector("img"));
+    info.querySelectorAll("tr").forEach(tr=>{
+      const th = tr.querySelector("th"), td = tr.querySelector("td");
+      if(th && td){ const k=clean(th.textContent), v=clean(td.textContent); if(k&&v) d.stats.push([k,v]); }
+    });
+    info.querySelectorAll(".pi-data").forEach(x=>{
+      const l=x.querySelector(".pi-data-label"), v=x.querySelector(".pi-data-value");
+      if(l&&v){ const k=clean(l.textContent), val=clean(v.textContent); if(k&&val) d.stats.push([k,val]); }
+    });
+  }
+  const root = doc.querySelector(".mw-parser-output") || doc.body;
+  let cur = {title:"Описание", items:[]}, skip = false;
+  const flush = ()=>{ if(!skip && cur.items.length) d.sections.push(cur); };
+  [...root.children].forEach(el=>{
+    if(el.matches(".infobox,.portable-infobox,aside,table")) return;
+    const h = /^H[2-4]$/.test(el.tagName) ? el : el.querySelector(":scope > h2, :scope > h3");
+    if(/^H[2-4]$/.test(el.tagName)){
+      flush();
+      const t = clean(el.textContent);
+      skip = SKIP.test(t);
+      cur = {title: SECT[t.toLowerCase()] || t, items:[]};
+      return;
+    }
+    if(el.tagName==="P"){ const t=clean(el.textContent); if(t.length>2) cur.items.push({p:t}); }
+    else if(el.tagName==="UL"||el.tagName==="OL"){
+      const li=[...el.children].map(x=>clean(x.firstChild && x.querySelector("ul")? [...x.childNodes].filter(n=>!(n.nodeType===1&&/^(UL|OL)$/.test(n.tagName))).map(n=>n.textContent).join(""):x.textContent)).filter(Boolean);
+      if(li.length) cur.items.push({ul:li.slice(0,25)});
+    }
+  });
+  flush();
+  dcache[o.name] = d; return d;
+}
+function secHTML(d){
+  return d.sections.map(s=>`<div class="sec"><h3>${esc(s.title)}</h3>${s.items.map(i=>i.p?`<p data-tx>${esc(i.p)}</p>`:`<ul>${i.ul.map(x=>`<li data-tx>${esc(x)}</li>`).join("")}</ul>`).join("")}</div>`).join("");
+}
+
+function cardStats(o){
+  const short = o.stats.filter(([k,v])=>!TEXTKEYS.includes(k.toLowerCase()) && v.length<=18);
+  const pick = [];
+  PRIORITY.forEach(p=>{ const f = short.find(([k])=>k.toLowerCase()===p); if(f && !pick.includes(f)) pick.push(f); });
+  short.forEach(s=>{ if(!pick.includes(s)) pick.push(s); });
+  return pick.slice(0,4);
+}
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const qvar = q => q && QCOL[q] ? `style="--q:var(${QCOL[q]})"` : `style="--q:var(--line)"`;
+
+function filtered(list){
+  const t = term.toLowerCase();
+  return list.filter(o=>(!t || o.name.toLowerCase().includes(t)) && (!cat.quality || !qf.size || qf.has(o.q)));
+}
+
+function render(){
+  const list = cache[cat.id]; if(!list) return;
+  const f = filtered(list);
+  $("count").textContent = `Найдено: ${f.length} из ${list.length}`;
+  if(!f.length){ $("view").innerHTML = '<div class="state">Ничего не найдено</div>'; return; }
+  const part = f.slice(0, shown);
+  $("view").innerHTML = `<div class="grid">${part.map((o,i)=>{
+    const st = cardStats(o);
+    return `<div class="card" data-i="${list.indexOf(o)}" ${qvar(o.q)}>
+      ${o.q?`<div class="q">${o.q}</div>`:""}
+      <div class="pic">${o.img?`<img loading="lazy" src="${esc(o.img)}" alt="" referrerpolicy="no-referrer">`:""}</div>
+      <div class="name">${esc(o.name)}</div>
+      <div class="quote" ${o.text?"data-tx":""}>${esc(o.text||"")}</div>
+      <div class="stats">${st.map(([k,v])=>`<div class="stat"><small>${esc(tl(k))}</small><b title="${esc(v)}">${esc(tv(v))}</b></div>`).join("")}</div>
+    </div>`}).join("")}</div>
+    ${f.length>shown?`<button class="more" id="more">Показать ещё (${f.length-shown})</button>`:""}`;
+  const m = $("more"); if(m) m.onclick = ()=>{ shown += 60; render(); };
+  trDom($("view"));
+}
+
+function drawChips(){
+  const box = $("chips");
+  if(!cat.quality){ box.innerHTML=""; return; }
+  box.innerHTML = QLIST.map(q=>`<button class="chip ${qf.has(q)?"on":""}" style="--c:var(${QCOL[q]})" data-q="${q}">${q}</button>`).join("");
+  box.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+    const q=b.dataset.q; qf.has(q)?qf.delete(q):qf.add(q); shown=60; drawChips(); render();
+  });
+}
+
+async function show(c){
+  cat = c; qf.clear(); shown = 60;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.id===c.id));
+  drawChips(); $("count").textContent = "";
+  if(!cache[c.id]) $("view").innerHTML = '<div class="state"><div class="spin"></div>Загружаю данные…</div>';
+  try{ await load(c); if(cat===c) render(); }
+  catch(e){
+    $("view").innerHTML = `<div class="state">Не удалось загрузить данные: ${esc(e.message)}<br><button id="retry">Повторить</button></div>`;
+    $("retry").onclick = ()=>show(c);
+  }
+}
+
+$("tabs").innerHTML = CATS.map(c=>`<button class="tab" data-id="${c.id}">${c.label}</button>`).join("");
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>show(CATS.find(c=>c.id===b.dataset.id)));
+$("q").oninput = e=>{ term = e.target.value.trim(); shown = 60; render(); };
+
+$("view").addEventListener("click", async e=>{
+  const card = e.target.closest(".card"); if(!card) return;
+  const o = cache[cat.id][+card.dataset.i];
+  const sh = $("sheet");
+  sh.style.setProperty("--q", o.q && QCOL[o.q] ? `var(${QCOL[o.q]})` : "var(--accent)");
+  const rowsHTML = st => `<div class="rows">${st.map(([k,v])=>`<div class="row"><span>${esc(tl(k))}</span><div ${needsTx(v)?"data-tx":""}>${esc(tv(v))}</div></div>`).join("")}</div>`;
+  const head = (img)=>`<div class="pic">${img?`<img src="${esc(img)}" alt="" referrerpolicy="no-referrer">`:""}</div>
+    <h2>${esc(o.name)} ${o.q?`<span style="color:var(${QCOL[o.q]});font-size:15px">· ${o.q}</span>`:""}</h2>`;
+  const foot = `<div class="actions"><button id="close">Закрыть</button></div>`;
+  sh.innerHTML = head(o.img) + rowsHTML(o.stats) + (o.link?`<div class="dload" id="dl"><div class="spin"></div>Загружаю подробности…</div>`:"") + foot;
+  $("modal").classList.add("open");
+  $("close").onclick = ()=>$("modal").classList.remove("open");
+  trDom(sh);
+  if(!o.link) return;
+  try{
+    const d = await loadDetail(o);
+    if(!$("modal").classList.contains("open") || !$("dl")) return;
+    const have = new Set(o.stats.map(([k])=>k.toLowerCase()));
+    const extra = d.stats.filter(([k])=>!have.has(k.toLowerCase()));
+    sh.innerHTML = head(d.img||o.img) + rowsHTML(o.stats.concat(extra)) + secHTML(d) + foot;
+    $("close").onclick = ()=>$("modal").classList.remove("open");
+    trDom(sh);
+  }catch(err){ const dl=$("dl"); if(dl) dl.textContent="Подробности недоступны"; }
+});
+$("modal").onclick = e=>{ if(e.target.id==="modal") $("modal").classList.remove("open"); };
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") $("modal").classList.remove("open"); });
+
+show(CATS[0]);
+</script>
+</body>
+</html>
